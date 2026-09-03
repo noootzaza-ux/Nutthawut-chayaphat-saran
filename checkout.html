@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>
+        สั่งซื้อสินค้า | IT SHOP
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/style.css">
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+    <div class="logo">
+
+        IT<span>SHOP</span>
+
+    </div>
+
+
+    <div class="nav">
+
+        <a href="/home">
+            ← กลับหน้าร้าน
+        </a>
+
+        <a href="/tracking">
+            📦 ติดตามการจัดส่ง
+        </a>
+
+    </div>
+
+</header>
+
+
+
+<main class="checkout-page">
+
+
+<div class="checkout">
+
+
+    <h1>
+        🛒 สั่งซื้อสินค้า
+    </h1>
+
+
+    <p class="checkout-subtitle">
+
+        กรุณาตรวจสอบสินค้า
+        และกรอกข้อมูลให้ครบถ้วน
+
+    </p>
+
+
+
+    <!-- =================================
+         รายการสินค้า
+    ================================== -->
+
+    <div class="checkout-card">
+
+        <h2>
+            📦 รายการสินค้า
+        </h2>
+
+
+        <div id="items"></div>
+
+
+        <div class="checkout-total">
+
+            <span>
+                ยอดรวมทั้งหมด
+            </span>
+
+            <strong>
+
+                <span id="total">
+                    0
+                </span>
+
+                บาท
+
+            </strong>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================
+         ข้อมูลผู้สั่งซื้อ
+    ================================== -->
+
+    <div class="checkout-card">
+
+
+        <h2>
+            👤 ข้อมูลผู้สั่งซื้อ
+        </h2>
+
+
+        <div class="form-grid">
+
+
+            <div>
+
+                <label>
+                    ชื่อ
+                </label>
+
+                <input
+                    type="text"
+                    id="firstName"
+                    placeholder="กรอกชื่อ">
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    นามสกุล
+                </label>
+
+                <input
+                    type="text"
+                    id="lastName"
+                    placeholder="กรอกนามสกุล">
+
+            </div>
+
+
+        </div>
+
+
+
+        <label>
+            อีเมล
+        </label>
+
+        <input
+            type="email"
+            id="email"
+            placeholder="example@email.com">
+
+
+
+        <label>
+            เบอร์โทรศัพท์
+        </label>
+
+        <input
+            type="tel"
+            id="phone"
+            placeholder="08xxxxxxxx">
+
+
+
+        <label>
+            ที่อยู่
+        </label>
+
+        <textarea
+            id="address"
+            placeholder="บ้านเลขที่ หมู่ ถนน ตำบล/แขวง อำเภอ/เขต จังหวัด">
+        </textarea>
+
+
+
+        <label>
+            รหัสไปรษณีย์
+        </label>
+
+        <input
+            type="text"
+            id="postcode"
+            maxlength="5"
+            placeholder="เช่น 76120">
+
+    </div>
+
+
+
+    <!-- =================================
+         PAYMENT
+    ================================== -->
+
+    <div class="checkout-card payment-card">
+
+
+        <h2>
+            💳 ชำระเงิน
+        </h2>
+
+
+        <p>
+            สแกน QR Code เพื่อชำระเงิน
+        </p>
+
+
+        <div class="qr-box">
+
+
+            <img
+                src="/images/payment-qr.png"
+                alt="QR Code"
+                class="qr-image">
+
+
+        </div>
+
+
+        <p class="payment-note">
+
+            กรุณาตรวจสอบยอดเงิน
+            ก่อนชำระเงิน
+
+        </p>
+
+    </div>
+
+
+
+    <!-- =================================
+         ยืนยัน
+    ================================== -->
+
+    <button
+        class="confirm-btn"
+        onclick="confirmOrder()">
+
+        ✅ ยืนยันการสั่งซื้อ
+
+    </button>
+
+
+</div>
+
+
+</main>
+
+
+
+<footer>
+
+    IT SHOP © 2026
+
+</footer>
+
+
+
+<script>
+
+
+// ======================================
+// โหลดตะกร้า
+// ======================================
+
+let cart =
+    JSON.parse(
+        localStorage.getItem("cart")
+    ) || [];
+
+
+let total = 0;
+
+
+
+// ======================================
+// แสดงสินค้า
+// ======================================
+
+function showItems() {
+
+
+    const items =
+        document.getElementById(
+            "items"
+        );
+
+
+    items.innerHTML = "";
+
+    total = 0;
+
+
+
+    if (cart.length === 0) {
+
+        items.innerHTML = `
+
+            <p>
+                ไม่มีสินค้าในตะกร้า
+            </p>
+
+        `;
+
+        return;
+
+    }
+
+
+
+    cart.forEach(item => {
+
+
+        const subtotal =
+            Number(item.price) *
+            Number(item.quantity);
+
+
+        total += subtotal;
+
+
+
+        items.innerHTML += `
+
+            <div class="checkout-item">
+
+                <div>
+
+                    <strong>
+                        ${item.name}
+                    </strong>
+
+                    <div class="item-detail">
+
+                        ${Number(item.price).toLocaleString()}
+                        บาท ×
+                        ${item.quantity}
+
+                    </div>
+
+                </div>
+
+
+                <strong>
+
+                    ${subtotal.toLocaleString()}
+                    บาท
+
+                </strong>
+
+            </div>
+
+        `;
+
+    });
+
+
+
+    document.getElementById(
+        "total"
+    ).innerText =
+        total.toLocaleString();
+
+}
+
+
+
+// ======================================
+// ยืนยันคำสั่งซื้อ
+// ======================================
+
+async function confirmOrder() {
+
+
+    const firstName =
+        document.getElementById(
+            "firstName"
+        ).value.trim();
+
+
+    const lastName =
+        document.getElementById(
+            "lastName"
+        ).value.trim();
+
+
+    const email =
+        document.getElementById(
+            "email"
+        ).value.trim();
+
+
+    const phone =
+        document.getElementById(
+            "phone"
+        ).value.trim();
+
+
+    const address =
+        document.getElementById(
+            "address"
+        ).value.trim();
+
+
+    const postcode =
+        document.getElementById(
+            "postcode"
+        ).value.trim();
+
+
+
+    // ==================================
+    // ตรวจสอบข้อมูล
+    // ==================================
+
+    if (
+        !firstName ||
+        !lastName ||
+        !email ||
+        !phone ||
+        !address ||
+        !postcode
+    ) {
+
+        alert(
+            "กรุณากรอกข้อมูลให้ครบทุกช่อง"
+        );
+
+        return;
+
+    }
+
+
+
+    if (cart.length === 0) {
+
+        alert(
+            "ไม่มีสินค้าในตะกร้า"
+        );
+
+        return;
+
+    }
+
+
+
+    if (
+        !/^[0-9]{5}$/.test(postcode)
+    ) {
+
+        alert(
+            "รหัสไปรษณีย์ต้องมี 5 หลัก"
+        );
+
+        return;
+
+    }
+
+
+
+    if (
+        !/^[0-9]{9,10}$/.test(phone)
+    ) {
+
+        alert(
+            "กรุณาตรวจสอบเบอร์โทรศัพท์"
+        );
+
+        return;
+
+    }
+
+
+
+    // ==================================
+    // ส่งข้อมูลไป Server
+    // ==================================
+
+    try {
+
+
+        const response =
+            await fetch(
+                "/create-order",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            firstName:
+                                firstName,
+
+                            lastName:
+                                lastName,
+
+                            email:
+                                email,
+
+                            phone:
+                                phone,
+
+                            address:
+                                address,
+
+                            postcode:
+                                postcode,
+
+                            cart:
+                                cart
+
+                        })
+
+                }
+            );
+
+
+
+        const data =
+            await response.json();
+
+
+
+        if (!data.success) {
+
+            alert(
+                data.message ||
+                "เกิดข้อผิดพลาด"
+            );
+
+            return;
+
+        }
+
+
+
+        // ==================================
+        // สั่งซื้อสำเร็จ
+        // ==================================
+
+        localStorage.removeItem(
+            "cart"
+        );
+
+
+
+        // แสดงเลขคำสั่งซื้อ
+
+        document.body.innerHTML = `
+
+            <div style="
+
+                min-height:100vh;
+
+                display:flex;
+
+                align-items:center;
+
+                justify-content:center;
+
+                background:#f4f6fb;
+
+                font-family:Arial;
+
+            ">
+
+
+                <div style="
+
+                    background:white;
+
+                    padding:45px;
+
+                    border-radius:18px;
+
+                    text-align:center;
+
+                    box-shadow:
+                    0 10px 40px
+                    rgba(0,0,0,0.1);
+
+                    max-width:500px;
+
+                    width:90%;
+
+                ">
+
+
+                    <div style="
+                        font-size:60px;
+                    ">
+                        🎉
+                    </div>
+
+
+                    <h1>
+                        สั่งซื้อสำเร็จ!
+                    </h1>
+
+
+                    <p>
+                        หมายเลขคำสั่งซื้อ
+                    </p>
+
+
+                    <h2 style="
+                        color:#6366f1;
+                        margin:15px 0;
+                    ">
+
+                        ${data.orderNumber}
+
+                    </h2>
+
+
+                    <p>
+
+                        ยอดชำระทั้งหมด
+
+                    </p>
+
+
+                    <h2>
+
+                        ${Number(
+                            data.total
+                        ).toLocaleString()}
+
+                        บาท
+
+                    </h2>
+
+
+                    <br>
+
+
+                    <a
+                        href="/tracking"
+                        style="
+
+                            display:inline-block;
+
+                            background:#6366f1;
+
+                            color:white;
+
+                            padding:13px 25px;
+
+                            border-radius:8px;
+
+                            text-decoration:none;
+
+                            font-weight:bold;
+
+                            margin:5px;
+
+                        ">
+
+                        📦 ติดตามคำสั่งซื้อ
+
+                    </a>
+
+
+                    <a
+                        href="/home"
+                        style="
+
+                            display:inline-block;
+
+                            background:#111827;
+
+                            color:white;
+
+                            padding:13px 25px;
+
+                            border-radius:8px;
+
+                            text-decoration:none;
+
+                            font-weight:bold;
+
+                            margin:5px;
+
+                        ">
+
+                        🏠 กลับหน้าร้าน
+
+                    </a>
+
+
+                </div>
+
+            </div>
+
+        `;
+
+
+    } catch (error) {
+
+
+        console.error(error);
+
+
+        alert(
+            "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้"
+        );
+
+    }
+
+}
+
+
+
+// ======================================
+// เริ่มต้น
+// ======================================
+
+showItems();
+
+</script>
+
+
+</body>
+
+</html>

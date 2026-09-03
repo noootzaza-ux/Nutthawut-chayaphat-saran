@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mechanical Keyboard | IT SHOP</title>
+
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<header class="header">
+
+    <div class="logo">
+        IT<span>SHOP</span>
+    </div>
+
+    <div class="nav">
+        <a href="/home">หน้าหลัก</a>
+
+        <a href="/home#cart" class="cart-button">
+            🛒 ตะกร้า
+        </a>
+    </div>
+
+</header>
+
+
+<div class="product-detail">
+
+    <img src="Aula f 75.jpg">
+
+    <div class="product-info">
+
+        <h1>Mechanical Keyboard</h1>
+
+        <div class="price">
+            ฿6,767
+        </div>
+
+        <p class="description">
+            Aula f 75
+            Mechanical Keyboard
+            สำหรับ Gaming และการทำงาน
+            ดีไซน์ทันสมัย ใช้งานได้ยาวนาน
+        </p>
+
+        <button class="buy-btn" onclick="addCart()">
+            🛒 เพิ่มลงตะกร้า
+        </button>
+
+        <a href="/home" class="back-btn">
+            ← กลับหน้าร้าน
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function addCart() {
+
+    let cart =
+        JSON.parse(localStorage.getItem("cart")) || [];
+
+    let product =
+        cart.find(item => item.id === 4);
+
+    if (product) {
+
+        product.quantity++;
+
+    } else {
+
+        cart.push({
+            id: 4,
+            name: "Mechanical Keyboard",
+            price: 6767,
+            quantity: 1
+        });
+
+    }
+
+    localStorage.setItem(
+        "cart",
+        JSON.stringify(cart)
+    );
+
+    alert("เพิ่มสินค้าลงตะกร้าแล้ว 🛒");
+}
+
+</script>
+
+</body>
+</html>

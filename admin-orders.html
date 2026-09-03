@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Admin | IT SHOP</title>
+
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<header class="header">
+
+    <div class="logo">
+        IT<span>SHOP</span>
+    </div>
+
+    <div class="nav">
+
+        <a href="/home">
+            🏠 หน้าหลัก
+        </a>
+
+        <a href="/my-orders">
+            🧾 คำสั่งซื้อของฉัน
+        </a>
+
+        <a href="/tracking">
+            📦 ติดตามการจัดส่ง
+        </a>
+
+    </div>
+
+</header>
+
+
+<main class="admin-page">
+
+    <div class="admin-container">
+
+        <div class="admin-header">
+
+            <div class="admin-icon">
+                ⚙️
+            </div>
+
+            <div>
+                <h1>
+                    จัดการคำสั่งซื้อ
+                </h1>
+
+                <p>
+                    ตรวจสอบและเปลี่ยนสถานะคำสั่งซื้อ
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- ==========================
+             ค้นหาคำสั่งซื้อ
+        =========================== -->
+
+        <div class="admin-search">
+
+            <input
+                type="text"
+                id="searchOrder"
+                placeholder="🔍 ค้นหาเลข Order, ชื่อลูกค้า หรือ Email..."
+                oninput="searchOrders()">
+
+            <button
+                type="button"
+                onclick="clearSearch()">
+
+                ✖ ล้าง
+
+            </button>
+
+        </div>
+
+
+        <div id="ordersContainer">
+
+            <div class="admin-loading">
+                ⏳ กำลังโหลดคำสั่งซื้อ...
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<footer>
+    IT SHOP © 2026
+</footer>
+
+
+<script>
+
+// ======================================
+// โหลดคำสั่งซื้อ
+// ======================================
+
+async function loadOrders() {
+
+    const container =
+        document.getElementById(
+            "ordersContainer"
+        );
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/admin/orders"
+            );
+
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+
+            throw new Error(
+                data.message ||
+                "ไม่สามารถโหลดข้อมูลได้"
+            );
+
+        }
+
+
+        if (
+            !data.orders ||
+            data.orders.length === 0
+        ) {
+
+            container.innerHTML = `
+
+                <div class="admin-empty">
+
+                    <div>
+                        📦
+                    </div>
+
+                    <h2>
+                        ยังไม่มีคำสั่งซื้อ
+                    </h2>
+
+                    <p>
+                        เมื่อมีลูกค้าสั่งซื้อ
+                        รายการจะแสดงที่นี่
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        container.innerHTML = "";
+
+
+        data.orders.forEach(order => {
+
+            container.innerHTML += `
+
+                <div class="admin-order-card">
+
+                    <!-- ==========================
+                         Order Header
+                    =========================== -->
+
+                    <div class="admin-order-top">
+
+                        <div>
+
+                            <span>
+                                หมายเลขคำสั่งซื้อ
+                            </span>
+
+                            <h2>
+                                ${escapeHTML(
+                                    order.order_number
+                                )}
+                            </h2>
+
+                            <p>
+                                ${formatDate(
+                                    order.created_at
+                                )}
+                            </p>
+
+                        </div>
+
+
+                        <div class="admin-current-status">
+
+                            ${getStatusIcon(
+                                order.status
+                            )}
+
+                            ${escapeHTML(
+                                order.status
+                            )}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ==========================
+                         ข้อมูลลูกค้า
+                    =========================== -->
+
+                    <div class="admin-order-info">
+
+
+                        <div>
+
+                            <span>
+                                ชื่อ
+                            </span>
+
+                            <strong>
+
+                                ${escapeHTML(
+                                    order.first_name
+                                )}
+
+                                ${escapeHTML(
+                                    order.last_name
+                                )}
+
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                เบอร์โทรศัพท์
+                            </span>
+
+                            <strong>
+                                ${escapeHTML(
+                                    order.phone
+                                )}
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Email
+                            </span>
+
+                            <strong>
+                                ${escapeHTML(
+                                    order.email
+                                )}
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                ยอดรวม
+                            </span>
+
+                            <strong class="admin-price">
+
+                                ฿${Number(
+                                    order.total
+                                ).toLocaleString()}
+
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <!-- ==========================
+                         ที่อยู่
+                    =========================== -->
+
+                    <div class="admin-address">
+
+                        <span>
+                            📍 ที่อยู่จัดส่ง
+                        </span>
+
+                        <strong>
+
+                            ${escapeHTML(
+                                order.address
+                            )}
+
+                            ${escapeHTML(
+                                order.postcode
+                            )}
+
+                        </strong>
+
+                    </div>
+
+
+                    <!-- ==========================
+                         เปลี่ยนสถานะ
+                    =========================== -->
+
+                    <div class="admin-status-control">
+
+                        <label>
+                            เปลี่ยนสถานะ
+                        </label>
+
+
+                        <select
+                            id="status-${order.order_number}">
+
+                            ${createStatusOptions(
+                                order.status
+                            )}
+
+                        </select>
+
+
+                        <button
+                            class="confirm-status-btn"
+                            type="button"
+                            onclick="updateStatus(
+                                '${order.order_number}'
+                            )">
+
+                            ✓ ยืนยันการเปลี่ยนแปลง
+
+                        </button>
+
+
+                        <a
+                            href="/tracking?order=${encodeURIComponent(
+                                order.order_number
+                            )}"
+                            target="_blank">
+
+                            📦 ดู Tracking
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        });
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        container.innerHTML = `
+
+            <div class="admin-error">
+
+                <h2>
+                    ❌ เกิดข้อผิดพลาด
+                </h2>
+
+                <p>
+                    ${escapeHTML(
+                        error.message
+                    )}
+                </p>
+
+                <button
+                    onclick="loadOrders()">
+
+                    🔄 ลองอีกครั้ง
+
+                </button>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+// ======================================
+// รายการสถานะ
+// ======================================
+
+function createStatusOptions(current) {
+
+    const statuses = [
+
+        "รอการชำระเงิน",
+
+        "ชำระเงินแล้ว",
+
+        "กำลังเตรียมสินค้า",
+
+        "กำลังจัดส่ง",
+
+        "กำลังนำจ่าย",
+
+        "จัดส่งสำเร็จ"
+
+    ];
+
+
+    return statuses.map(status => {
+
+        return `
+
+            <option
+                value="${status}"
+                ${status === current
+                    ? "selected"
+                    : ""}>
+
+                ${status}
+
+            </option>
+
+        `;
+
+    }).join("");
+
+}
+
+
+// ======================================
+// เปลี่ยนสถานะ
+// ======================================
+
+async function updateStatus(orderNumber) {
+
+    const select =
+        document.getElementById(
+            `status-${orderNumber}`
+        );
+
+
+    if (!select) {
+
+        alert(
+            "ไม่พบช่องสถานะ"
+        );
+
+        return;
+
+    }
+
+
+    const status =
+        select.value;
+
+
+    try {
+
+        const response =
+            await fetch(
+
+                `/api/order/${encodeURIComponent(
+                    orderNumber
+                )}/status`,
+
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body: JSON.stringify({
+
+                        status: status
+
+                    })
+
+                }
+
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok ||
+            !data.success) {
+
+            throw new Error(
+                data.message ||
+                "เปลี่ยนสถานะไม่สำเร็จ"
+            );
+
+        }
+
+
+        alert(
+            "✅ เปลี่ยนสถานะสำเร็จ"
+        );
+
+
+        loadOrders();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        alert(
+            "❌ " +
+            error.message
+        );
+
+    }
+
+}
+
+
+// ======================================
+// ไอคอนสถานะ
+// ======================================
+
+function getStatusIcon(status) {
+
+    const icons = {
+
+        "รอการชำระเงิน": "💳",
+
+        "ชำระเงินแล้ว": "💰",
+
+        "กำลังเตรียมสินค้า": "📦",
+
+        "กำลังจัดส่ง": "🚚",
+
+        "กำลังนำจ่าย": "🏠",
+
+        "จัดส่งสำเร็จ": "✅"
+
+    };
+
+
+    return icons[status] || "📦";
+
+}
+
+
+// ======================================
+// แปลงวันที่
+// ======================================
+
+function formatDate(date) {
+
+    if (!date) {
+
+        return "-";
+
+    }
+
+
+    return new Date(date)
+        .toLocaleString(
+            "th-TH",
+            {
+                dateStyle: "medium",
+                timeStyle: "short"
+            }
+        );
+
+}
+
+
+// ======================================
+// ป้องกัน HTML
+// ======================================
+
+function escapeHTML(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+// ======================================
+// ค้นหาคำสั่งซื้อ
+// ======================================
+
+function searchOrders() {
+
+    const keyword =
+        document
+            .getElementById("searchOrder")
+            .value
+            .toLowerCase()
+            .trim();
+
+    const cards =
+        document.querySelectorAll(
+            ".admin-order-card"
+        );
+
+    cards.forEach(card => {
+
+        const content =
+            card.innerText.toLowerCase();
+
+        card.style.display =
+            content.includes(keyword)
+                ? ""
+                : "none";
+
+    });
+
+}
+
+
+// ======================================
+// ล้างการค้นหา
+// ======================================
+
+function clearSearch() {
+
+    const input =
+        document.getElementById(
+            "searchOrder"
+        );
+
+    input.value = "";
+
+    searchOrders();
+
+}
+
+
+// ======================================
+// เริ่มต้น
+// ======================================
+
+loadOrders();
+
+</script>
+
+</body>
+
+</html>

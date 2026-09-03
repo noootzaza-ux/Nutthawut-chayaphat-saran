@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>สมัครสมาชิก | IT SHOP</title>
+
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<div class="auth-page">
+
+    <div class="auth-box">
+
+        <div class="auth-logo">
+            IT<span>SHOP</span>
+        </div>
+
+        <h1>สร้างบัญชี</h1>
+
+        <form action="/register" method="POST">
+
+            <label>ชื่อ</label>
+            <input type="text" name="name" required>
+
+            <label>นามสกุล</label>
+            <input type="text" name="lname" required>
+
+            <label>Email</label>
+            <input type="email" name="email" required>
+
+            <label>Password</label>
+            <input type="password" name="password" required>
+
+            <button type="submit">
+                สมัครสมาชิก
+            </button>
+
+        </form>
+
+        <a class="auth-link" href="/login">
+            มีบัญชีอยู่แล้ว? เข้าสู่ระบบ
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

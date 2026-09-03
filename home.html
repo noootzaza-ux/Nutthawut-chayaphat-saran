@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>IT SHOP</title>
+
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header class="header">
+
+    <div class="logo">
+        IT<span>SHOP</span>
+    </div>
+
+
+ <div class="nav">
+
+    <a href="/home">
+        🏠 หน้าหลัก
+    </a>
+
+    <a href="#products">
+        🛍️ สินค้า
+    </a>
+
+    <a href="/my-orders">
+        🧾 คำสั่งซื้อของฉัน
+    </a>
+
+    <a href="/tracking">
+        📦 ติดตามการจัดส่ง
+    </a>
+
+    <a href="#cart" class="cart-button">
+        🛒 ตะกร้า
+        (<span id="cartCount">0</span>)
+    </a>
+
+</div>
+
+</header>
+
+
+
+<!-- =========================
+     HERO
+========================= -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>
+
+            อุปกรณ์ IT<br>
+            สำหรับทุกคน
+
+        </h1>
+
+
+        <p>
+
+            รวมสินค้า IT และ
+            อุปกรณ์คอมพิวเตอร์
+            คุณภาพดี ราคาคุ้มค่า
+
+        </p>
+
+
+        <a
+            href="#products"
+            class="hero-btn">
+
+            เลือกซื้อสินค้า
+
+        </a>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================
+     PRODUCTS
+========================= -->
+
+<section
+    class="products-section"
+    id="products">
+
+
+    <h2 class="section-title">
+
+        🔥 สินค้าแนะนำ
+
+    </h2>
+
+
+
+    <div class="products">
+
+
+        <!-- =====================
+             PRODUCT 1
+        ====================== -->
+
+        <div class="product">
+
+
+            <img
+                src="Magnetic.jpg"
+                alt="Magnetic Keyboard">
+
+
+            <h2>
+                Magnetic Keyboard
+            </h2>
+
+
+            <div class="price">
+
+                ฿2,400
+
+            </div>
+
+
+            <a
+                href="/product1"
+                class="detail-btn">
+
+                ดูรายละเอียด
+
+            </a>
+
+
+            <button
+                onclick="addCart(
+                    1,
+                    'Gaming Keyboard',
+                    2400
+                )">
+
+                🛒 เพิ่มลงตะกร้า
+
+            </button>
+
+
+        </div>
+
+
+
+        <!-- =====================
+             PRODUCT 2
+        ====================== -->
+
+        <div class="product">
+
+
+            <img
+                src="viperrazor.jpg"
+                alt="Gaming Mouse">
+
+
+            <h2>
+                Gaming Mouse
+            </h2>
+
+
+            <div class="price">
+
+                ฿5,000
+
+            </div>
+
+
+            <a
+                href="/product2"
+                class="detail-btn">
+
+                ดูรายละเอียด
+
+            </a>
+
+
+            <button
+                onclick="addCart(
+                    2,
+                    'Gaming Mouse',
+                    5000
+                )">
+
+                🛒 เพิ่มลงตะกร้า
+
+            </button>
+
+
+        </div>
+
+
+
+        <!-- =====================
+             PRODUCT 3
+        ====================== -->
+
+        <div class="product">
+
+
+            <img
+                src="hyperxcloundII.jpg"
+                alt="Gaming Headset">
+
+
+            <h2>
+                Gaming Headset
+            </h2>
+
+
+            <div class="price">
+
+                ฿2,200
+
+            </div>
+
+
+            <a
+                href="/product3"
+                class="detail-btn">
+
+                ดูรายละเอียด
+
+            </a>
+
+
+            <button
+                onclick="addCart(
+                    3,
+                    'Gaming Headset',
+                    2200
+                )">
+
+                🛒 เพิ่มลงตะกร้า
+
+            </button>
+
+
+        </div>
+
+
+
+        <!-- =====================
+             PRODUCT 4
+        ====================== -->
+
+        <div class="product">
+
+
+            <img
+                src="Aula f 75.jpg"
+                alt="Mechanical Keyboard">
+
+
+            <h2>
+                Mechanical Keyboard
+            </h2>
+
+
+            <div class="price">
+
+                ฿6,767
+
+            </div>
+
+
+            <a
+                href="/product4"
+                class="detail-btn">
+
+                ดูรายละเอียด
+
+            </a>
+
+
+            <button
+                onclick="addCart(
+                    4,
+                    'Mechanical Keyboard',
+                    6767
+                )">
+
+                🛒 เพิ่มลงตะกร้า
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================
+     CART
+========================= -->
+
+<section
+    class="cart"
+    id="cart">
+
+
+    <h2>
+        🛒 ตะกร้าสินค้า
+    </h2>
+
+
+    <div id="cartItems"></div>
+
+
+    <div class="total">
+
+        รวมทั้งหมด:
+
+        <span id="total">
+            0
+        </span>
+
+        บาท
+
+    </div>
+
+
+    <button
+        class="order-btn"
+        onclick="checkout()">
+
+        สั่งซื้อสินค้า
+
+    </button>
+
+
+</section>
+
+
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer>
+
+    IT SHOP © 2026
+
+</footer>
+
+
+
+<script>
+
+
+// =================================
+// โหลดตะกร้าจาก LocalStorage
+// =================================
+
+let cart =
+    JSON.parse(
+        localStorage.getItem("cart")
+    ) || [];
+
+
+
+// =================================
+// บันทึกตะกร้า
+// =================================
+
+function saveCart() {
+
+
+    localStorage.setItem(
+        "cart",
+        JSON.stringify(cart)
+    );
+
+
+    showCart();
+
+}
+
+
+
+// =================================
+// เพิ่มสินค้า
+// =================================
+
+function addCart(
+    id,
+    name,
+    price
+) {
+
+
+    let product =
+        cart.find(
+            item => item.id === id
+        );
+
+
+    if (product) {
+
+
+        product.quantity++;
+
+
+    } else {
+
+
+        cart.push({
+
+            id: id,
+
+            name: name,
+
+            price: price,
+
+            quantity: 1
+
+        });
+
+
+    }
+
+
+    saveCart();
+
+
+    alert(
+        "เพิ่มสินค้าลงตะกร้าแล้ว 🛒"
+    );
+
+}
+
+
+
+// =================================
+// ลบสินค้า
+// =================================
+
+function removeCart(index) {
+
+
+    cart.splice(
+        index,
+        1
+    );
+
+
+    saveCart();
+
+}
+
+
+
+// =================================
+// แสดงตะกร้า
+// =================================
+
+function showCart() {
+
+
+    const container =
+        document.getElementById(
+            "cartItems"
+        );
+
+
+    const count =
+        document.getElementById(
+            "cartCount"
+        );
+
+
+    const totalElement =
+        document.getElementById(
+            "total"
+        );
+
+
+    container.innerHTML = "";
+
+
+    let total = 0;
+
+    let itemCount = 0;
+
+
+
+    // ไม่มีสินค้า
+
+    if (cart.length === 0) {
+
+
+        container.innerHTML = `
+
+            <p style="
+                color:#6b7280;
+                padding:20px 0;
+            ">
+
+                ยังไม่มีสินค้าในตะกร้า
+
+            </p>
+
+        `;
+
+
+    }
+
+
+
+    // มีสินค้า
+
+    cart.forEach(
+        (item, index) => {
+
+
+            let price =
+                Number(item.price) *
+                Number(item.quantity);
+
+
+            total += price;
+
+
+            itemCount +=
+                Number(item.quantity);
+
+
+
+            container.innerHTML += `
+
+                <div class="cart-row">
+
+
+                    <div>
+
+                        <strong>
+                            ${item.name}
+                        </strong>
+
+
+                        <br>
+
+
+                        ${Number(
+                            item.price
+                        ).toLocaleString()}
+
+                        บาท
+
+                        ×
+
+                        ${item.quantity}
+
+
+                    </div>
+
+
+
+                    <button
+
+                        class="remove-btn"
+
+                        onclick="
+                            removeCart(${index})
+                        ">
+
+                        ลบ
+
+                    </button>
+
+
+                </div>
+
+            `;
+
+
+        }
+    );
+
+
+
+    // จำนวนสินค้า
+
+    count.innerText =
+        itemCount;
+
+
+
+    // ยอดรวม
+
+    totalElement.innerText =
+        total.toLocaleString();
+
+}
+
+
+
+// =================================
+// ไปหน้า Checkout
+// =================================
+
+function checkout() {
+
+
+    if (cart.length === 0) {
+
+
+        alert(
+            "ตะกร้ายังไม่มีสินค้า"
+        );
+
+
+        return;
+
+    }
+
+
+    window.location.href =
+        "/checkout";
+
+}
+
+
+
+// =================================
+// เริ่มต้น
+// =================================
+
+showCart();
+
+
+</script>
+
+
+</body>
+
+</html>

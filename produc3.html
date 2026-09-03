@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gaming Headset | IT SHOP</title>
+
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<header class="header">
+
+    <div class="logo">
+        IT<span>SHOP</span>
+    </div>
+
+    <div class="nav">
+        <a href="/home">หน้าหลัก</a>
+
+        <a href="/home#cart" class="cart-button">
+            🛒 ตะกร้า
+        </a>
+    </div>
+
+</header>
+
+
+<div class="product-detail">
+
+    <img src="hyperxcloundII.jpg">
+
+    <div class="product-info">
+
+        <h1>Gaming Headset</h1>
+
+        <div class="price">
+            ฿2,200
+        </div>
+
+        <p class="description">
+            hyperX clound II
+            หูฟัง Gaming พร้อมไมโครโฟน
+            เสียงคมชัด เหมาะสำหรับเล่นเกม
+            และฟังเพลง
+        </p>
+
+        <button class="buy-btn" onclick="addCart()">
+            🛒 เพิ่มลงตะกร้า
+        </button>
+
+        <a href="/home" class="back-btn">
+            ← กลับหน้าร้าน
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function addCart() {
+
+    let cart =
+        JSON.parse(localStorage.getItem("cart")) || [];
+
+    let product =
+        cart.find(item => item.id === 3);
+
+    if (product) {
+
+        product.quantity++;
+
+    } else {
+
+        cart.push({
+            id: 3,
+            name: "Gaming Headset",
+            price: 2200,
+            quantity: 1
+        });
+
+    }
+
+    localStorage.setItem(
+        "cart",
+        JSON.stringify(cart)
+    );
+
+    alert("เพิ่มสินค้าลงตะกร้าแล้ว 🛒");
+}
+
+</script>
+
+</body>
+</html>

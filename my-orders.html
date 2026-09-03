@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>คำสั่งซื้อของฉัน | IT SHOP</title>
+
+    <link
+        rel="stylesheet"
+        href="/style.css">
+
+</head>
+
+
+<body>
+
+
+<!-- =================================
+     HEADER
+================================= -->
+
+<header class="header">
+
+    <div class="logo">
+        IT<span>SHOP</span>
+    </div>
+
+
+    <div class="nav">
+
+        <a href="/home">
+            🏠 หน้าหลัก
+        </a>
+
+        <a href="/home#products">
+            🛍️ สินค้า
+        </a>
+
+        <a href="/tracking">
+            📦 ติดตามการจัดส่ง
+        </a>
+
+        <a href="/my-orders">
+            🧾 คำสั่งซื้อของฉัน
+        </a>
+
+    </div>
+
+</header>
+
+
+
+<!-- =================================
+     MAIN
+================================= -->
+
+<main class="my-orders-page">
+
+
+    <div class="my-orders-container">
+
+
+        <!-- หัวข้อ -->
+
+        <div class="my-orders-header">
+
+            <div class="my-orders-icon">
+                🧾
+            </div>
+
+            <div>
+
+                <h1>
+                    คำสั่งซื้อของฉัน
+                </h1>
+
+                <p>
+                    ดูรายการและติดตามคำสั่งซื้อทั้งหมดของคุณ
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- รายการ Order -->
+
+        <div
+            id="ordersContainer"
+            class="orders-container">
+
+
+            <div class="orders-loading">
+
+                <div class="loading-icon">
+                    ⏳
+                </div>
+
+                <h2>
+                    กำลังโหลดคำสั่งซื้อ...
+                </h2>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</main>
+
+
+
+<footer>
+
+    IT SHOP © 2026
+
+</footer>
+
+
+
+<script>
+
+
+// ======================================
+// โหลดคำสั่งซื้อ
+// ======================================
+
+async function loadOrders() {
+
+
+    const container =
+        document.getElementById(
+            "ordersContainer"
+        );
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "/api/my-orders"
+            );
+
+
+        const data =
+            await response.json();
+
+
+
+        // ===============================
+        // ยังไม่ได้ Login
+        // ===============================
+
+        if (
+            response.status === 401
+        ) {
+
+            container.innerHTML = `
+
+                <div class="orders-empty">
+
+                    <div class="empty-order-icon">
+                        🔐
+                    </div>
+
+                    <h2>
+                        กรุณาเข้าสู่ระบบ
+                    </h2>
+
+                    <p>
+                        คุณต้องเข้าสู่ระบบ
+                        เพื่อดูคำสั่งซื้อของคุณ
+                    </p>
+
+                    <a
+                        href="/login"
+                        class="order-login-btn">
+
+                        เข้าสู่ระบบ
+
+                    </a>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+
+        // ===============================
+        // เกิดข้อผิดพลาด
+        // ===============================
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+
+            throw new Error(
+                "โหลดข้อมูลไม่สำเร็จ"
+            );
+
+        }
+
+
+
+        // ===============================
+        // ไม่มี Order
+        // ===============================
+
+        if (
+            !data.orders ||
+            data.orders.length === 0
+        ) {
+
+            container.innerHTML = `
+
+                <div class="orders-empty">
+
+                    <div class="empty-order-icon">
+                        🛍️
+                    </div>
+
+                    <h2>
+                        ยังไม่มีคำสั่งซื้อ
+                    </h2>
+
+                    <p>
+                        เมื่อคุณสั่งซื้อสินค้า
+                        รายการจะปรากฏที่นี่
+                    </p>
+
+
+                    <a
+                        href="/home#products"
+                        class="order-login-btn">
+
+                        เลือกซื้อสินค้า
+
+                    </a>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+
+        // ===============================
+        // แสดง Order
+        // ===============================
+
+        container.innerHTML = "";
+
+
+        data.orders.forEach(order => {
+
+
+            const status =
+                order.status ||
+                "รอการชำระเงิน";
+
+
+            const statusInfo =
+                getStatusInfo(status);
+
+
+            const date =
+                new Date(
+                    order.created_at
+                );
+
+
+            const dateText =
+                date.toLocaleString(
+                    "th-TH",
+                    {
+                        dateStyle: "medium",
+                        timeStyle: "short"
+                    }
+                );
+
+
+
+            container.innerHTML += `
+
+                <div class="order-card">
+
+
+                    <!-- หัว Order -->
+
+                    <div class="order-card-top">
+
+
+                        <div>
+
+                            <span class="order-label">
+                                หมายเลขคำสั่งซื้อ
+                            </span>
+
+                            <h2>
+                                ${escapeHTML(
+                                    order.order_number
+                                )}
+                            </h2>
+
+                            <p class="order-card-date">
+                                ${dateText}
+                            </p>
+
+                        </div>
+
+
+                        <div class="order-status">
+
+                            ${statusInfo.icon}
+
+                            ${escapeHTML(status)}
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- รายละเอียด -->
+
+                    <div class="order-card-info">
+
+
+                        <div>
+
+                            <span>
+                                ผู้สั่งซื้อ
+                            </span>
+
+                            <strong>
+
+                                ${escapeHTML(
+                                    order.first_name
+                                )}
+
+                                ${escapeHTML(
+                                    order.last_name
+                                )}
+
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                จำนวนสินค้า
+                            </span>
+
+                            <strong>
+
+                                ${order.item_count || 0}
+                                รายการ
+
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                ยอดรวม
+                            </span>
+
+                            <strong class="order-price">
+
+                                ฿${Number(
+                                    order.total
+                                ).toLocaleString()}
+
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- ปุ่ม -->
+
+                    <div class="order-card-bottom">
+
+
+                        <span>
+
+                            สถานะ:
+                            <strong>
+                                ${escapeHTML(status)}
+                            </strong>
+
+                        </span>
+
+
+                        <a
+                            href="/tracking?order=${encodeURIComponent(
+                                order.order_number
+                            )}"
+                            class="view-order-btn">
+
+                            ดูรายละเอียด
+                            →
+
+                        </a>
+
+
+                    </div>
+
+
+                </div>
+
+            `;
+
+        });
+
+
+    } catch (error) {
+
+
+        console.error(error);
+
+
+        container.innerHTML = `
+
+            <div class="orders-empty">
+
+                <div class="empty-order-icon">
+                    ⚠️
+                </div>
+
+                <h2>
+                    เกิดข้อผิดพลาด
+                </h2>
+
+                <p>
+                    ไม่สามารถโหลดคำสั่งซื้อได้
+                </p>
+
+                <button
+                    class="order-login-btn"
+                    onclick="loadOrders()">
+
+                    ลองอีกครั้ง
+
+                </button>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+
+// ======================================
+// สถานะ
+// ======================================
+
+function getStatusInfo(status) {
+
+
+    const statusList = {
+
+        "รอการชำระเงิน": {
+            icon: "💳"
+        },
+
+        "ชำระเงินแล้ว": {
+            icon: "💰"
+        },
+
+        "กำลังเตรียมสินค้า": {
+            icon: "📦"
+        },
+
+        "กำลังจัดส่ง": {
+            icon: "🚚"
+        },
+
+        "กำลังนำจ่าย": {
+            icon: "🏠"
+        },
+
+        "จัดส่งสำเร็จ": {
+            icon: "✅"
+        }
+
+    };
+
+
+    return statusList[status] || {
+        icon: "📦"
+    };
+
+}
+
+
+
+// ======================================
+// ป้องกัน HTML
+// ======================================
+
+function escapeHTML(value) {
+
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+
+// ======================================
+// เริ่มต้น
+// ======================================
+
+loadOrders();
+
+</script>
+
+
+</body>
+
+</html>

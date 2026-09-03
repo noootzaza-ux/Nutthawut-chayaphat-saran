@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>
+        ติดตามคำสั่งซื้อ | IT SHOP
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/style.css">
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================
+     HEADER
+===================================== -->
+
+<header class="header">
+
+    <div class="logo">
+        IT<span>SHOP</span>
+    </div>
+
+
+    <div class="nav">
+
+        <a href="/home">
+            🏠 หน้าหลัก
+        </a>
+
+        <a href="/home#products">
+            🛍️ สินค้า
+        </a>
+
+        <a href="/tracking">
+            📦 ติดตามการจัดส่ง
+        </a>
+
+    </div>
+
+</header>
+
+
+
+<!-- =====================================
+     MAIN
+===================================== -->
+
+<main class="tracking-page">
+
+
+    <div class="tracking-header">
+
+        <h1>
+            📦 ติดตามคำสั่งซื้อ
+        </h1>
+
+        <p>
+            กรอกหมายเลขคำสั่งซื้อ
+            เพื่อตรวจสอบรายละเอียด
+        </p>
+
+    </div>
+
+
+
+    <!-- =================================
+         SEARCH
+    ================================== -->
+
+    <div class="tracking-search">
+
+        <input
+            type="text"
+            id="orderNumber"
+            placeholder="เช่น IT202609011234"
+            autocomplete="off">
+
+
+        <button onclick="searchOrder()">
+
+            🔍 ค้นหา
+
+        </button>
+
+    </div>
+
+
+
+    <!-- =================================
+         RESULT
+    ================================== -->
+
+    <div
+        class="tracking-result"
+        id="trackingResult">
+
+
+        <div class="empty-tracking">
+
+            <div class="tracking-icon">
+                📦
+            </div>
+
+            <h2>
+                ยังไม่ได้ค้นหาคำสั่งซื้อ
+            </h2>
+
+            <p>
+                กรอกหมายเลขคำสั่งซื้อด้านบน
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+</main>
+
+
+
+<!-- =====================================
+     FOOTER
+===================================== -->
+
+<footer>
+
+    IT SHOP © 2026
+
+</footer>
+
+
+
+<script>
+
+
+// ======================================
+// ค้นหาคำสั่งซื้อ
+// ======================================
+
+async function searchOrder() {
+
+
+    const input =
+        document.getElementById(
+            "orderNumber"
+        );
+
+
+    const orderNumber =
+        input.value.trim();
+
+
+    // ------------------------------
+    // ตรวจสอบว่าใส่เลข Order หรือยัง
+    // ------------------------------
+
+    if (!orderNumber) {
+
+        alert(
+            "กรุณากรอกหมายเลขคำสั่งซื้อ"
+        );
+
+        input.focus();
+
+        return;
+
+    }
+
+
+
+    const result =
+        document.getElementById(
+            "trackingResult"
+        );
+
+
+    // แสดง Loading
+
+    result.innerHTML = `
+
+        <div class="empty-tracking">
+
+            <div class="tracking-icon">
+                ⏳
+            </div>
+
+            <h2>
+                กำลังค้นหาคำสั่งซื้อ...
+            </h2>
+
+            <p>
+                กรุณารอสักครู่
+            </p>
+
+        </div>
+
+    `;
+
+
+
+    try {
+
+
+        // =================================
+        // ขอข้อมูลจาก Server
+        // =================================
+
+        const response =
+            await fetch(
+                `/api/order/${encodeURIComponent(orderNumber)}`
+            );
+
+
+        const data =
+            await response.json();
+
+
+
+        // =================================
+        // ไม่พบ Order
+        // =================================
+
+        if (!response.ok || !data.success) {
+
+
+            result.innerHTML = `
+
+                <div class="empty-tracking">
+
+                    <div class="tracking-icon">
+                        ❌
+                    </div>
+
+                    <h2>
+                        ไม่พบคำสั่งซื้อ
+                    </h2>
+
+                    <p>
+                        ไม่พบหมายเลข
+                        <strong>
+                            ${escapeHTML(orderNumber)}
+                        </strong>
+                    </p>
+
+                    <p>
+                        กรุณาตรวจสอบหมายเลขอีกครั้ง
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+
+        // =================================
+        // แสดงข้อมูล
+        // =================================
+
+        showOrder(data.order, data.items);
+
+
+    } catch (error) {
+
+
+        console.error(error);
+
+
+        result.innerHTML = `
+
+            <div class="empty-tracking">
+
+                <div class="tracking-icon">
+                    ⚠️
+                </div>
+
+                <h2>
+                    เกิดข้อผิดพลาด
+                </h2>
+
+                <p>
+                    ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+
+// ======================================
+// แสดง Order
+// ======================================
+
+function showOrder(order, items) {
+
+
+    const result =
+        document.getElementById(
+            "trackingResult"
+        );
+
+
+    // ==================================
+    // แปลงสถานะ
+    // ==================================
+
+    const status =
+        order.status || "รอการชำระเงิน";
+
+
+    const statusInfo =
+        getStatusInfo(status);
+
+
+
+    // ==================================
+    // สร้างรายการสินค้า
+    // ==================================
+
+    let itemsHTML = "";
+
+
+    if (!items || items.length === 0) {
+
+
+        itemsHTML = `
+
+            <p class="no-items">
+                ไม่พบรายการสินค้า
+            </p>
+
+        `;
+
+
+    } else {
+
+
+        items.forEach(item => {
+
+
+            itemsHTML += `
+
+                <div class="tracking-product">
+
+                    <div>
+
+                        <strong>
+                            ${escapeHTML(
+                                item.product_name
+                            )}
+                        </strong>
+
+                        <p>
+
+                            ${Number(
+                                item.price
+                            ).toLocaleString()}
+
+                            บาท ×
+
+                            ${item.quantity}
+
+                        </p>
+
+                    </div>
+
+
+                    <strong>
+
+                        ${Number(
+                            item.subtotal
+                        ).toLocaleString()}
+
+                        บาท
+
+                    </strong>
+
+                </div>
+
+            `;
+
+        });
+
+    }
+
+
+
+    // ==================================
+    // วันที่
+    // ==================================
+
+    const createdDate =
+        new Date(
+            order.created_at
+        );
+
+
+    const dateText =
+        createdDate.toLocaleString(
+            "th-TH",
+            {
+                dateStyle: "long",
+                timeStyle: "short"
+            }
+        );
+
+
+
+    // ==================================
+    // แสดงทั้งหมด
+    // ==================================
+
+    result.innerHTML = `
+
+
+        <!-- ============================
+             ORDER HEADER
+        ============================= -->
+
+        <div class="order-box">
+
+
+            <div class="order-top">
+
+
+                <div>
+
+                    <span>
+                        หมายเลขคำสั่งซื้อ
+                    </span>
+
+
+                    <h2>
+
+                        ${escapeHTML(
+                            order.order_number
+                        )}
+
+                    </h2>
+
+
+                    <p class="order-date">
+
+                        สั่งซื้อเมื่อ
+                        ${dateText}
+
+                    </p>
+
+                </div>
+
+
+
+                <div class="status-badge">
+
+                    ${statusInfo.icon}
+
+                    ${escapeHTML(status)}
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =========================
+                 STATUS
+            ========================== -->
+
+            <div class="tracking-status">
+
+                <h2>
+                    สถานะการจัดส่ง
+                </h2>
+
+
+                <div class="timeline">
+
+
+                    ${createTimeline(status)}
+
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =========================
+                 CUSTOMER
+            ========================== -->
+
+            <div class="tracking-info">
+
+
+                <h2>
+                    👤 ข้อมูลผู้สั่งซื้อ
+                </h2>
+
+
+                <div class="info-grid">
+
+
+                    <div class="info-item">
+
+                        <span>
+                            ชื่อ - นามสกุล
+                        </span>
+
+                        <strong>
+
+                            ${escapeHTML(
+                                order.first_name
+                            )}
+
+                            ${escapeHTML(
+                                order.last_name
+                            )}
+
+                        </strong>
+
+                    </div>
+
+
+
+                    <div class="info-item">
+
+                        <span>
+                            อีเมล
+                        </span>
+
+                        <strong>
+
+                            ${escapeHTML(
+                                order.email
+                            )}
+
+                        </strong>
+
+                    </div>
+
+
+
+                    <div class="info-item">
+
+                        <span>
+                            เบอร์โทรศัพท์
+                        </span>
+
+                        <strong>
+
+                            ${escapeHTML(
+                                order.phone
+                            )}
+
+                        </strong>
+
+                    </div>
+
+
+
+                    <div class="info-item">
+
+                        <span>
+                            รหัสไปรษณีย์
+                        </span>
+
+                        <strong>
+
+                            ${escapeHTML(
+                                order.postcode
+                            )}
+
+                        </strong>
+
+                    </div>
+
+
+
+                    <div class="info-item full">
+
+                        <span>
+                            ที่อยู่จัดส่ง
+                        </span>
+
+                        <strong>
+
+                            ${escapeHTML(
+                                order.address
+                            )}
+
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =========================
+                 PRODUCTS
+            ========================== -->
+
+            <div class="tracking-info">
+
+
+                <h2>
+                    🛍️ รายการสินค้า
+                </h2>
+
+
+                <div class="tracking-products">
+
+                    ${itemsHTML}
+
+                </div>
+
+
+                <div class="tracking-total">
+
+                    <span>
+                        ยอดรวมทั้งหมด
+                    </span>
+
+
+                    <strong>
+
+                        ${Number(
+                            order.total
+                        ).toLocaleString()}
+
+                        บาท
+
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    `;
+
+}
+
+
+
+// ======================================
+// Timeline
+// ======================================
+
+function createTimeline(currentStatus) {
+
+
+    const statuses = [
+
+        {
+            name: "รอการชำระเงิน",
+            icon: "💳"
+        },
+
+        {
+            name: "ชำระเงินแล้ว",
+            icon: "💰"
+        },
+
+        {
+            name: "กำลังเตรียมสินค้า",
+            icon: "📦"
+        },
+
+        {
+            name: "กำลังจัดส่ง",
+            icon: "🚚"
+        },
+
+        {
+            name: "กำลังนำจ่าย",
+            icon: "🏠"
+        },
+
+        {
+            name: "จัดส่งสำเร็จ",
+            icon: "✅"
+        }
+
+    ];
+
+
+    const currentIndex =
+        statuses.findIndex(
+            item =>
+                item.name === currentStatus
+        );
+
+
+    return statuses.map(
+        (item, index) => {
+
+
+            let className = "";
+
+
+            if (
+                currentIndex >= 0 &&
+                index < currentIndex
+            ) {
+
+                className =
+                    "completed";
+
+            }
+
+
+            if (
+                index === currentIndex
+            ) {
+
+                className =
+                    "active";
+
+            }
+
+
+            return `
+
+                <div
+                    class="timeline-item ${className}"
+                >
+
+                    <div class="timeline-dot">
+
+                        ${item.icon}
+
+                    </div>
+
+
+                    <div>
+
+                        <h3>
+
+                            ${item.name}
+
+                        </h3>
+
+
+                        ${
+                            index === currentIndex
+                            ?
+                            `<p>
+                                สถานะปัจจุบัน
+                            </p>`
+                            :
+                            ""
+                        }
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+    ).join("");
+
+}
+
+
+
+// ======================================
+// ข้อมูลสถานะ
+// ======================================
+
+function getStatusInfo(status) {
+
+
+    const statusList = {
+
+        "รอการชำระเงิน": {
+            icon: "💳"
+        },
+
+        "ชำระเงินแล้ว": {
+            icon: "💰"
+        },
+
+        "กำลังเตรียมสินค้า": {
+            icon: "📦"
+        },
+
+        "กำลังจัดส่ง": {
+            icon: "🚚"
+        },
+
+        "กำลังนำจ่าย": {
+            icon: "🏠"
+        },
+
+        "จัดส่งสำเร็จ": {
+            icon: "✅"
+        }
+
+    };
+
+
+    return statusList[status] || {
+        icon: "📦"
+    };
+
+}
+
+
+
+// ======================================
+// ป้องกัน HTML แปลก ๆ
+// ======================================
+
+function escapeHTML(value) {
+
+
+    if (value === null ||
+        value === undefined) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replace(/&/g, "&amp;")
+
+        .replace(/</g, "&lt;")
+
+        .replace(/>/g, "&gt;")
+
+        .replace(/"/g, "&quot;")
+
+        .replace(/'/g, "&#039;");
+
+}
+
+
+
+// ======================================
+// กด Enter เพื่อค้นหา
+// ======================================
+
+document
+    .getElementById("orderNumber")
+    .addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                searchOrder();
+
+            }
+
+        }
+    );
+
+
+</script>
+
+
+</body>
+
+</html>
